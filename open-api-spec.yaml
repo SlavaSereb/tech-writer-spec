@@ -103,20 +103,3 @@ paths:
     post:
       summary: Add a new technical writer task.
       operationId: addTask
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TaskInput'
-      responses:
-        '201':
-          description: Task created.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Task'
-        '400':
-          description: Bad request, incorrect task format.
-        '401':
-          description: Unauthorized, API key missing or invalid.
