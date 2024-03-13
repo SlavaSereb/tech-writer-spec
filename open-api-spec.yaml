@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: Technical Writer Tasks API
+  description: API for managing technical writer tasks.
+  version: 1.0.0
+servers:
+  - url: https://api.techwriter.xyz
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+security:
+  - ApiKeyAuth: []
+paths:
+  /tasks:
+    get:
+      summary: Retrieve all technical writer tasks.
+      operationId: getTasks
+      responses:
+        '200':
+          description: An array of tasks.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized, API key missing or invalid.
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        task_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        component:
+          type: string
+        sub_tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubTask'
+    TaskInput:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        component:
+          type: string
+        sub_tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubTask'
+    SubTask:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
