@@ -11,25 +11,6 @@ components:
       type: apiKey
       in: header
       name: Authorization
-security:
-  - ApiKeyAuth: []
-paths:
-  /tasks:
-    get:
-      summary: Retrieve all technical writer tasks.
-      operationId: getTasks
-      responses:
-        '200':
-          description: An array of tasks.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Task'
-        '401':
-          description: Unauthorized, API key missing or invalid.
-components:
   schemas:
     Task:
       type: object
@@ -41,13 +22,13 @@ components:
         description:
           type: string
         status:
-          type: string
+          $ref: '#/components/schemas/StatusEnum'
         component:
-          type: string
-        sub_tasks:
+          $ref: '#/components/schemas/ComponentEnum'
+        connected_tasks:
           type: array
           items:
-            $ref: '#/components/schemas/SubTask'
+            $ref: '#/components/schemas/ConnectedTask'
     TaskInput:
       type: object
       properties:
@@ -56,19 +37,86 @@ components:
         description:
           type: string
         status:
-          type: string
+          $ref: '#/components/schemas/StatusEnum'
         component:
-          type: string
-        sub_tasks:
+          $ref: '#/components/schemas/ComponentEnum'
+        connected_tasks:
           type: array
           items:
-            $ref: '#/components/schemas/SubTask'
-    SubTask:
+            $ref: '#/components/schemas/ConnectedTask'
+    ConnectedTask:
       type: object
       properties:
+        task_id:
+          type: string
         title:
           type: string
         description:
           type: string
         status:
-          type: string
+          $ref: '#/components/schemas/StatusEnum'
+    StatusEnum:
+      type: string
+      enum: [OPEN, IN_PROGRESS, COMPLETED]
+    ComponentEnum:
+      type: string
+      enum: [API_DOCS, HELP_CENTER, SDK_DOCS, OAS_FILE]
+security:
+  - ApiKeyAuth: []
+paths:
+  /tasks:
+    get:
+      summary: Retrieve all technical writer tasks.
+      operationId: getTasks
+      parameters:
+        - name: status
+          in: query
+          description: Filter tasks by status.
+          required: false
+          schema:
+            $ref: '#/components/schemas/StatusEnum'
+        - name: component
+          in: query
+          description: Filter tasks by component.
+          required: false
+          schema:
+            $ref: '#/components/schemas/ComponentEnum'
+        - name: updatedAfter
+          in: query
+          description: Filter tasks that have been updated after a specific date (YYYY-MM-DD).
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: An array of tasks.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized, API key missing or invalid.
+  /task:
+    post:
+      summary: Add a new technical writer task.
+      operationId: addTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '201':
+          description: Task created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request, incorrect task format.
+        '401':
+          description: Unauthorized, API key missing or invalid.
