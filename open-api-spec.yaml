@@ -10,7 +10,7 @@ components:
     ApiKeyAuth:
       type: apiKey
       in: header
-      name: Authorization
+      name: X-API-KEY
   schemas:
     Task:
       type: object
